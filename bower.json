@@ -1,0 +1,26 @@
+{
+  "name": "data-viewer",
+  "version": "0.0.0",
+  "homepage": "https://github.com/peterneish/data-viewer",
+  "authors": [
+    "Peter Neish <peter.neish@gmail.com>"
+  ],
+  "description": "display simple data tables",
+  "main": "app.js",
+  "keywords": [
+    "recline",
+    "data"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "recline": "https://github.com/okfn/recline.git#4f1bf987b389984f9b03506dcd6ff14aa03f30f1"
+  }
+}
