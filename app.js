@@ -1,17 +1,20 @@
 var sampleData = [
   {
+    id: 1,
     title: 'War and Peace',
     description: 'The epic tale of love, war and history',
     Author: 'Tolstoy',
     price: 7.99
   },
   {
+    id: 2,
     title: 'Anna Karenina',
     description: 'How things go wrong in love and ultimately lead to suicide. This is why you should not have affairs, girls!',
     Author: 'Tolstoy',
     price: 8.50
   },
   {
+    id: 3,
     title: "Fathers and Sons",
     description: "Another 19th century Russian novel",
     Author: "Turgenev",
@@ -21,7 +24,8 @@ var sampleData = [
 
 //create the new dataset
 var dataset = new recline.Model.Dataset({
-  records: sampleData
+  records: sampleData,
+
 });
 
 
@@ -36,6 +40,7 @@ var AppRouter = Backbone.Router.extend({
 
 var app_router = new AppRouter;
 app_router.on('route:getItem', function(id) {
+    showItem(id);
     console.log("item is" + id);
 });
 
@@ -48,9 +53,16 @@ Backbone.history.start();
 
 // function that updates the data displayed
 function updateDisplay(){
-  $("#data-display").html(
-      JSON.stringify(dataset.records.toJSON(), null, 2)
-  );
+
+  var content = "";
+
+  console.log(dataset.records);
+
+  dataset.records.each(function(rec){
+          content += "<p>title: " + rec.get('title') + "<a href='#/items/" + rec.id + "'>click</a></p>";
+  });
+
+  $("#data-display").html(content);
 
 }
 
@@ -59,6 +71,12 @@ function doSearch(){
   console.log(dataset.queryState.get('q'));
   app_router.navigate("search/" + dataset.queryState.get('q'));
 
+}
+
+function showItem(id){
+  $("#data-display").html(
+      dataset.records.get(id).get('title')
+  )
 }
 
 
