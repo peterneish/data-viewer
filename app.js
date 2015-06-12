@@ -25,15 +25,45 @@ var dataset = new recline.Model.Dataset({
 });
 
 
+// set up the routes
+var AppRouter = Backbone.Router.extend({
+    routes: {
+        "items/:id": "getItem",
+        "search/:qy": "searchItems",
+        "*actions": "defaultRoute"
+    }
+});
+
+var app_router = new AppRouter;
+app_router.on('route:getItem', function(id) {
+    console.log("item is" + id);
+});
+
+app_router.on('route:searchItems', function(qy){
+  dataset.query({"q": qy});
+});
+
+Backbone.history.start();
+
+
 // function that updates the data displayed
 function updateDisplay(){
   $("#data-display").html(
       JSON.stringify(dataset.records.toJSON(), null, 2)
-  )
+  );
+
 }
 
+function doSearch(){
+  updateDisplay();
+  console.log(dataset.queryState.get('q'));
+  app_router.navigate("search/" + dataset.queryState.get('q'));
+
+}
+
+
 // when a record gets queried the records are reset, so this will fire
-dataset.records.bind('reset', updateDisplay);
+dataset.records.bind('reset', doSearch);
 
 // create the search box and add to the page
 var queryEditor = new recline.View.QueryEditor({
