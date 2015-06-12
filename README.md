@@ -1,7 +1,7 @@
 # data-viewer
 displays flat file data. Currently a work in progress  - not useful yet.
 
-# Installation
+## Installation
 Clone this repository
 
 `git clone https://github.com/peterneish/data-viewer.git`
@@ -14,10 +14,10 @@ Install dependencies with bower
 
 Open up the `index.html` file in a browser
 
-#Customising
+## Customising
 Check out the views directory for modifying the templates.
 
-#Credits
+## Credits
 Built on top of some excellent libraries:
 * [recline.js](http://okfnlabs.org/recline/)
 

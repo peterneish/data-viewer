@@ -19,19 +19,29 @@ var sampleData = [
   }
 ];
 
+//create the new dataset
 var dataset = new recline.Model.Dataset({
   records: sampleData
 });
 
-$("#data-display").html(
-      JSON.stringify(dataset.records.toJSON(), null, 2)
-)
 
+// function that updates the data displayed
+function updateDisplay(){
+  $("#data-display").html(
+      JSON.stringify(dataset.records.toJSON(), null, 2)
+  )
+}
+
+// when a record gets queried the records are reset, so this will fire
+dataset.records.bind('reset', updateDisplay);
+
+// create the search box and add to the page
 var queryEditor = new recline.View.QueryEditor({
     model: dataset.queryState
 	  });
 	  
 $('#search').append(queryEditor.el);
+
 
 
 	
