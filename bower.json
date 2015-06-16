@@ -21,6 +21,7 @@
     "tests"
   ],
   "dependencies": {
-    "recline": "https://github.com/okfn/recline.git#4f1bf987b389984f9b03506dcd6ff14aa03f30f1"
+    "recline": "https://github.com/okfn/recline.git#4f1bf987b389984f9b03506dcd6ff14aa03f30f1",
+    "recline.backend.gdocs": "https://github.com/okfn/recline.backend.gdocs.git#e81bb237759353932834a38a0ec810441e0ada10"
   }
 }

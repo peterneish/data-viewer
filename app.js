@@ -23,10 +23,24 @@ var sampleData = [
 ];
 
 //create the new dataset
-var dataset = new recline.Model.Dataset({
-  records: sampleData,
+//var dataset = new recline.Model.Dataset({
+//  records: sampleData,
+//});
 
+
+var dataset = new recline.Model.Dataset({
+  url: 'https://docs.google.com/spreadsheets/d/1B6LKp6QzNqZFqRXoZ63lgK_T3pluSwtgCN7B1HSV0HU/edit#gid=0',
+  backend: 'gdocs'
+
+})
+
+// Now do the query to the backend to load data
+dataset.fetch().done(function(dataset) {
+  if (console) {
+    //console.log(dataset.records);
+  }
 });
+
 
 
 // set up the routes
@@ -45,6 +59,7 @@ app_router.on('route:getItem', function(id) {
 });
 
 app_router.on('route:searchItems', function(qy){
+  dataset.fetch();
   dataset.query({"q": qy});
 });
 
@@ -59,7 +74,7 @@ function updateDisplay(){
   console.log(dataset.records);
 
   dataset.records.each(function(rec){
-          content += "<p>title: " + rec.get('title') + "<a href='#/items/" + rec.id + "'>click</a></p>";
+          content += "<p>title: " + rec.get('title') + " <a href='#/items/" + rec.id + "'>click</a></p>";
   });
 
   $("#data-display").html(content);
@@ -67,6 +82,10 @@ function updateDisplay(){
 }
 
 function doSearch(){
+  dataset.fetch().done(function(dataset){
+
+    updateDisplay();
+  });
   updateDisplay();
   console.log(dataset.queryState.get('q'));
   app_router.navigate("search/" + dataset.queryState.get('q'));
