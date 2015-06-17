@@ -50,11 +50,9 @@ function fetchData(callback){
       });
 
       dataset.fetch().done(
-          function(ds){
             if(callback && typeof callback === 'function' ){
                 callback(dataset);
             }
-          }
       );
 
       // when a record gets queried the records are reset, so this will fire
