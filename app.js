@@ -1,67 +1,62 @@
-// set up the app
-var app_router;
-var dataset;
-var havedata = false;
 
-fetchData();
+$(document).ready(function() {
+	router = new AppRouter();
+	Backbone.history.start();
+});	
+
 
 // set up the routes
 var AppRouter = Backbone.Router.extend({
-    routes: {
-        "items/:id": "getItem",
-        "search/:qy": "searchItems",
-        "*actions": "defaultRoute" 
-    }
-});
-
-app_router = new AppRouter;
-app_router.on('route:getItem', function(id) {
-    showItem(id);
-});
-
-app_router.on('route:searchItems', function(qy){
-  doSearch(qy);
-});
-
-app_router.on('route:defaultRoute', function(){
-  console.log("defaultroute");
-})
-
-Backbone.history.start();
-
-// create the search box and add to the page
-var queryEditor = new recline.View.QueryEditor({
-    model: dataset.queryState
-});
-    
-$('#search').append(queryEditor.el); 
-
-function fetchData(callback){
-  
-  if(dataset && typeof dataset.queryState !== 'undefined'){
-     if(callback && typeof callback === 'function' ){
-        callback(dataset);
-      } 
-  }
-  else{
-      dataset = new recline.Model.Dataset({
+	
+	
+	queryEditor: null,
+	container: null,
+	dataset: null,
+	rec: null,
+	dataPromise: null,
+	
+	
+	initialize: function() {
+		this.dataset = new recline.Model.Dataset({
         url: 'https://docs.google.com/spreadsheets/d/1B6LKp6QzNqZFqRXoZ63lgK_T3pluSwtgCN7B1HSV0HU/edit#gid=0',
         backend: 'gdocs'
       });
+	  dataPromise = this.dataset.fetch();
+	  this.queryEditor = new recline.View.QueryEditor({
+			model: this.dataset.queryState
+	  });
+	  $('#search').append(this.queryEditor.el); 
+	},
+	
+    routes: {
+		"": "startPage",
+        "items/:id": "getItem",
+        "search/:qy": "searchItems"
+    },
+	
+	startPage: function (){
+		console.log('ran startPage');
+	 },
+	
+	getItem: function (itemId){
+		console.log('ran getItem');
+		$.when(dataPromise).then( function(d){
+		this.rec = d.records.get(itemId);
+			
+		   $('#item-display').show();
+		   $('#data-display').hide();
+		   $('#item-display').html(
+			   '<b>'+ this.rec.get('title') + '</b> '
+				   + this.rec.get('description')
+		   );
+		});	
 
-      dataset.fetch().done(
-            if(callback && typeof callback === 'function' ){
-                callback(dataset);
-            }
-      );
 
-      // when a record gets queried the records are reset, so this will fire
-      dataset.records.bind('reset', doSearch);
-  
-  }
+       
+	}
+});
 
-}
-
+/*
 // function that updates the data displayed
 function doSearch(qy){
 
@@ -83,19 +78,5 @@ function doSearch(qy){
   $('#data-display').show();
   $('#item-display').hide();
 }
+*/
 
-
-// TODO - use templates or custom view
-function showItem(id){
-
-    fetchData();
-
-    rec = dataset.records.get(id);
-
-      $('#item-display').show();
-      $('#data-display').hide();
-      $('#item-display').html(
-          '<b>'+ rec.get('title') + '</b> '
-               + rec.get('description')
-      );
-}
