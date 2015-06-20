@@ -8,9 +8,9 @@ $(document).ready(function() {
 // set up the routes
 var AppRouter = Backbone.Router.extend({
 	
-	
 	queryEditor: null,
-	container: null,
+	resultView: null,
+	recordView: null,
 	dataset: null,
 	rec: null,
 	dataPromise: null,
@@ -18,14 +18,23 @@ var AppRouter = Backbone.Router.extend({
 	
 	initialize: function() {
 		this.dataset = new recline.Model.Dataset({
-        url: 'https://docs.google.com/spreadsheets/d/1B6LKp6QzNqZFqRXoZ63lgK_T3pluSwtgCN7B1HSV0HU/edit#gid=0',
-        backend: 'gdocs'
-      });
-	  dataPromise = this.dataset.fetch();
-	  this.queryEditor = new recline.View.QueryEditor({
+			url: 'https://docs.google.com/spreadsheets/d/1B6LKp6QzNqZFqRXoZ63lgK_T3pluSwtgCN7B1HSV0HU/edit#gid=0',
+			backend: 'gdocs'
+		});
+		this.dataPromise = this.dataset.fetch();
+		this.queryEditor = new recline.View.QueryEditor({
 			model: this.dataset.queryState
-	  });
-	  $('#search').append(this.queryEditor.el); 
+		});
+		$('#search').append(this.queryEditor.el);		
+		
+		this.dataView = new recline.View.SlickGrid({
+			model: this.dataset,
+		});
+		$('#data-display').append(this.dataView.el);
+		this.dataView.visible = true;
+		this.dataView.render();
+		this.dataset.records.bind('reset', this.dataView.render);
+	
 	},
 	
     routes: {
@@ -36,25 +45,30 @@ var AppRouter = Backbone.Router.extend({
 	
 	startPage: function (){
 		console.log('ran startPage');
+		this.dataView.render();
 	 },
+	 
+	 searchItem: function(qy){
+		this.dataset.query("q", qy); 
+	 },
+	 
 	
 	getItem: function (itemId){
 		console.log('ran getItem');
-		$.when(dataPromise).then( function(d){
+		$.when(this.dataPromise).then( function(d){
 		this.rec = d.records.get(itemId);
 			
 		   $('#item-display').show();
 		   $('#data-display').hide();
 		   $('#item-display').html(
 			   '<b>'+ this.rec.get('title') + '</b> '
-				   + this.rec.get('description')
+				    + this.rec.get('description')
 		   );
 		});	
-
-
-       
 	}
 });
+
+
 
 /*
 // function that updates the data displayed
