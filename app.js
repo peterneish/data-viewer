@@ -26,6 +26,8 @@ var AppRouter = Backbone.Router.extend({
 			backend: 'gdocs'
 		});
 		
+
+		
 		this.resultView = new recline.View.Grid({
 			model: this.dataset,
 			el: $('#data-display')
@@ -45,6 +47,12 @@ var AppRouter = Backbone.Router.extend({
 
 		that = this;
 		this.dataPromise = this.dataset.fetch();
+		
+		$.when(this.dataPromise).then(function(){
+				that.dataset.queryState.set({
+					size: 5
+				});
+		});
 		//this.dataset.fetch().done(function(){
 		//	that.resultView.render();
 		//});
