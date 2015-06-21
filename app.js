@@ -1,5 +1,7 @@
 
+
 $(document).ready(function() {
+	
 	router = new AppRouter();
 	Backbone.history.start();
 });	
@@ -10,6 +12,7 @@ var AppRouter = Backbone.Router.extend({
 	
 	queryEditor: null,
 	resultView: null,
+	pager: null,
 	recordView: null,
 	dataset: null,
 	rec: null,
@@ -18,23 +21,33 @@ var AppRouter = Backbone.Router.extend({
 	
 	initialize: function() {
 		this.dataset = new recline.Model.Dataset({
-			url: 'https://docs.google.com/spreadsheets/d/1B6LKp6QzNqZFqRXoZ63lgK_T3pluSwtgCN7B1HSV0HU/edit#gid=0',
+			url: '//https://docs.google.com/spreadsheets/d/1B6LKp6QzNqZFqRXoZ63lgK_T3pluSwtgCN7B1HSV0HU/edit#gid=0',
+			//url: 'https://docs.google.com/spreadsheet/ccc?key=0Aon3JiuouxLUdGZPaUZsMjBxeGhfOWRlWm85MmV0UUE#gid=0',
 			backend: 'gdocs'
 		});
-		this.dataPromise = this.dataset.fetch();
+		
+		this.resultView = new recline.View.Grid({
+			model: this.dataset,
+			el: $('#data-display')
+		});
+		this.resultView.visible = true;
+		this.resultView.render();
+		
 		this.queryEditor = new recline.View.QueryEditor({
 			model: this.dataset.queryState
 		});
-		$('#search').append(this.queryEditor.el);		
-		
-		this.dataView = new recline.View.SlickGrid({
-			model: this.dataset,
-		});
-		$('#data-display').append(this.dataView.el);
-		this.dataView.visible = true;
-		this.dataView.render();
-		this.dataset.records.bind('reset', this.dataView.render);
-	
+		$('#search').append(this.queryEditor.el);	
+
+		this.pager = new recline.View.Pager({
+			  model: this.dataset
+			});
+		$('#pager-here').append(this.pager.el);		
+
+		that = this;
+		this.dataPromise = this.dataset.fetch();
+		//this.dataset.fetch().done(function(){
+		//	that.resultView.render();
+		//});
 	},
 	
     routes: {
@@ -45,7 +58,13 @@ var AppRouter = Backbone.Router.extend({
 	
 	startPage: function (){
 		console.log('ran startPage');
-		this.dataView.render();
+		this.resultView.render();
+		self = this;
+		$.when(this.dataPromise).then(function(d){
+			self.resultView.render();
+		});
+		
+		
 	 },
 	 
 	 searchItem: function(qy){
