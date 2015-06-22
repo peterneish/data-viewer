@@ -13,7 +13,7 @@ var AppRouter = Backbone.Router.extend({
 	queryEditor: null,
 	resultView: null,
 	pager: null,
-  facets: null,
+	facets: null,
 	recordView: null,
 	dataset: null,
 	rec: null,
@@ -23,11 +23,9 @@ var AppRouter = Backbone.Router.extend({
 	initialize: function() {
 		this.dataset = new recline.Model.Dataset({
 			url: '//https://docs.google.com/spreadsheets/d/1B6LKp6QzNqZFqRXoZ63lgK_T3pluSwtgCN7B1HSV0HU/edit#gid=0',
-			//url: 'https://docs.google.com/spreadsheet/ccc?key=0Aon3JiuouxLUdGZPaUZsMjBxeGhfOWRlWm85MmV0UUE#gid=0',
 			backend: 'gdocs'
 		});
 		
-
 		// resultList
 		this.resultView = new recline.View.Grid({
 			model: this.dataset,
@@ -36,35 +34,37 @@ var AppRouter = Backbone.Router.extend({
 		this.resultView.visible = true;
 		this.resultView.render();
 		
-    // search box
+		// search box
 		this.queryEditor = new recline.View.QueryEditor({
 			model: this.dataset.queryState
 		});
-		$('#search').append(this.queryEditor.el);	
+		$('#search').append(this.queryEditor.el);
 
-    // pager
+		//this.listenTo(this.queryEditor, 'submit form', this.searchSubmit);
+
+		// pager
 		this.pager = new recline.View.Pager({
 			  model: this.dataset
 			});
 		$('#pager-here').append(this.pager.el);		
 
-    //facets
-    this.facets = new recline.View.FacetViewer({
-      model: this.dataset
-    });
-    this.facets.render();
-    $('#facets').append(this.facets.el);
-
-    // now get the data and create a promise object
+		//facets
+		this.facets = new recline.View.FacetViewer({
+			model: this.dataset
+		});
+		this.facets.render();
+		$('#facets').append(this.facets.el);
+		
+		// now get the data and create a promise object
 		that = this;
 		this.dataPromise = this.dataset.fetch();
 		
-    // limit results
+		// limit results
 		$.when(this.dataPromise).then(function(){
-				that.dataset.queryState.set({
-					size: 5
-				});
-        that.dataset.queryState.addFacet('author');
+			that.dataset.queryState.set({
+				size: 5
+			});
+			that.dataset.queryState.addFacet('author');
 		});
 	},
 	
@@ -82,7 +82,7 @@ var AppRouter = Backbone.Router.extend({
 		});
 	},
 	 
-  //handle a search via url 
+	//handle a search via url 
 	searchItems: function(qy){
     self = this;
     $.when(this.dataPromise).then(function(d){
@@ -91,51 +91,38 @@ var AppRouter = Backbone.Router.extend({
     });
 	},
 
-  // handle a submitted search
-  searchSubmit: function(){
-    console.log('searchSubmit');
-    //console.log(e);
-  },
+	// handle a submitted search
+	searchSubmit: function(){
+		//still trying to work out how to this and not kill the events in the 
+		//queryEditor
+		console.log("search submitted");
+		//this.navigate("/search/test");
+	},
 	 
-	
+	// get a single item via url
 	getItem: function (itemId){
-		console.log('ran getItem');
+		self = this;
 		$.when(this.dataPromise).then( function(d){
-		this.rec = d.records.get(itemId);
+			rec = self.dataset.records.get(itemId);
 			
-		   $('#item-display').show();
-		   $('#data-display').hide();
-		   $('#item-display').html(
-			   '<b>'+ this.rec.get('title') + '</b> '
-				    + this.rec.get('description')
-		   );
+			recView = new recline.View.ItemView({
+				model: rec,
+				el: '#item-display'
+			});
+			console.log("doing item");
+			recView.render();
+		
+				
+			  /* $('#item-display').show();
+			   $('#data-display').hide();
+			   $('#item-display').html(
+				   '<b>'+ rec.get('title') + '</b> '
+						+ rec.get('description')
+			   );
+			  */
+
+		  
 		});	
 	}
 });
-
-
-
-/*
-// function that updates the data displayed
-function doSearch(qy){
-
-  fetchData(function(d){
-      d.query({"q": qy});
-
-  });
-
-  app_router.navigate("search/" + qy);
-
-
-
-
-  dataset.records.each(function(rec){
-          content += "<p>title: " + rec.get('title') + " <a href='#/items/" + rec.id + "'>click</a></p>";
-  });
-
-  $("#data-display").html(content);
-  $('#data-display').show();
-  $('#item-display').hide();
-}
-*/
 
