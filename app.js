@@ -13,6 +13,7 @@ var AppRouter = Backbone.Router.extend({
 	queryEditor: null,
 	resultView: null,
 	pager: null,
+  facets: null,
 	recordView: null,
 	dataset: null,
 	rec: null,
@@ -27,7 +28,7 @@ var AppRouter = Backbone.Router.extend({
 		});
 		
 
-		
+		// resultList
 		this.resultView = new recline.View.Grid({
 			model: this.dataset,
 			el: $('#data-display')
@@ -35,27 +36,36 @@ var AppRouter = Backbone.Router.extend({
 		this.resultView.visible = true;
 		this.resultView.render();
 		
+    // search box
 		this.queryEditor = new recline.View.QueryEditor({
 			model: this.dataset.queryState
 		});
 		$('#search').append(this.queryEditor.el);	
 
+    // pager
 		this.pager = new recline.View.Pager({
 			  model: this.dataset
 			});
 		$('#pager-here').append(this.pager.el);		
 
+    //facets
+    this.facets = new recline.View.FacetViewer({
+      model: this.dataset
+    });
+    this.facets.render();
+    $('#facets').append(this.facets.el);
+
+    // now get the data and create a promise object
 		that = this;
 		this.dataPromise = this.dataset.fetch();
 		
+    // limit results
 		$.when(this.dataPromise).then(function(){
 				that.dataset.queryState.set({
 					size: 5
 				});
+        that.dataset.queryState.addFacet('author');
 		});
-		//this.dataset.fetch().done(function(){
-		//	that.resultView.render();
-		//});
 	},
 	
     routes: {
@@ -65,19 +75,27 @@ var AppRouter = Backbone.Router.extend({
     },
 	
 	startPage: function (){
-		console.log('ran startPage');
 		this.resultView.render();
 		self = this;
 		$.when(this.dataPromise).then(function(d){
 			self.resultView.render();
 		});
-		
-		
-	 },
+	},
 	 
-	 searchItem: function(qy){
-		this.dataset.query("q", qy); 
-	 },
+  //handle a search via url 
+	searchItems: function(qy){
+    self = this;
+    $.when(this.dataPromise).then(function(d){
+      console.log(d);
+		  d.query({"q": qy});
+    });
+	},
+
+  // handle a submitted search
+  searchSubmit: function(){
+    console.log('searchSubmit');
+    //console.log(e);
+  },
 	 
 	
 	getItem: function (itemId){
