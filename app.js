@@ -105,23 +105,20 @@ var AppRouter = Backbone.Router.extend({
 		$.when(this.dataPromise).then( function(d){
 			rec = self.dataset.records.get(itemId);
 			
-			recView = new recline.View.ItemView({
-				model: rec,
-				el: '#item-display'
-			});
-			console.log("doing item");
-			recView.render();
-		
+			//$.get('views/itemView.mst', function(t){
 				
-			  /* $('#item-display').show();
-			   $('#data-display').hide();
-			   $('#item-display').html(
-				   '<b>'+ rec.get('title') + '</b> '
-						+ rec.get('description')
-			   );
-			  */
+				//console.log(t);
+							
+				recView = new recline.View.ItemView({
+					model: rec,
+					template: '{{title}} {{id}}',
+					el: '#item-display'
+				});
+				recView.set({'template': 'PAsswed {{title}} {{id}}'});
 
-		  
+				recView.render();
+			//});	
+	  
 		});	
 	}
 });

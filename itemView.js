@@ -10,6 +10,7 @@ this.recline.View = this.recline.View || {};
   "use strict";
 my.ItemView = Backbone.View.extend({
 	className: 'recline-item-view',
+	tagName:  "div",
 	template: '\
 		<div> \
 			<h2>{{title}}</h2> \
@@ -17,9 +18,10 @@ my.ItemView = Backbone.View.extend({
 		</div>\
 	',
 		
-	initialize: function() {
+	initialize: function(initData) {
 		_.bindAll(this, 'render');
 		this.listenTo(this.model, 'change', this.render);
+		if(initData.template
 		this.render();
 	},
 	render: function() {
